@@ -2,52 +2,7 @@ const store = new Vuex.Store({
   state: {
     activeRoomId: null,
     currentView: 'rooms',
-    emptyViews: {
-      admin: [
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '1st Admin empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '2nd Admin empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '3rd Admin empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '4th Admin empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '5th Admin empty view'
-        }
-      ],
-      user: [
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '1st User empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '2nd User empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '3rd User empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '4th User empty view'
-        },
-        {
-          image: '../templates/inbox/assets/inbox.png',
-          message: '5th User empty view'
-        }
-      ]
-    }
+    emptyViews
   },
   getters: {
     activeRoom: state => {
@@ -65,51 +20,62 @@ const store = new Vuex.Store({
       return roles.includes('admin');
     },
     emptyView: (state, getters) => {
-      let emptyViews;
+      let sentences;
       if (getters.isUserAdmin) {
-        emptyViews = state.emptyViews.admin;
+        sentences = state.emptyViews.sentences.admin;
       } else {
-        emptyViews = state.emptyViews.user;
+        sentences = state.emptyViews.sentences.user;
       }
 
-      const view = emptyViews[Math.floor(Math.random() * emptyViews.length)];
+      const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
+      const randomImage = state.emptyViews.images[Math.floor(Math.random() * state.emptyViews.images.length)];
 
-      return view;
+      return {
+        message: randomSentence,
+        image: randomImage
+      };
     }
   },
   mutations: {
-    setView (state, { view }) {
-      Vue.set(state, 'currentView', view);
+    setView(state, { view }) {
+      if (state.currentView === view) {
+        Vue.set(state, 'currentView', 'rooms');
+      } else {
+        Vue.set(state, 'currentView', view);
+      }
     },
-    setRooms (state, { rooms }) {
+    setRooms(state, { rooms }) {
       Vue.set(state, 'rooms', rooms);
     },
-    setActiveRoom (state, { roomId }) {
+    setActiveRoom(state, { roomId }) {
       if (state.activeRoomId === roomId) {
         Vue.set(state, 'activeRoomId', null);
       } else {
-        Vue.set(state, 'activeRoomId', roomId);        
+        Vue.set(state, 'activeRoomId', roomId);
       }
     },
-    appendMessageToRoom (state, { message }) {
+    appendMessageToRoom(state, { message }) {
       const room = state.rooms.find(room => room._id === message.room);
 
       if (room) {
         room.messages.push(message);
       }
+    },
+    appendRoomToList (state, { room }) {
+      state.rooms.push(room);
     }
   },
   actions: {
     changeView({ commit }, { view }) {
       commit('setView', { view });
     },
-    changeRoom ({ commit }, { roomId }) {
+    changeRoom({ commit }, { roomId }) {
       return new Promise((resolve, reject) => {
         commit('setActiveRoom', { roomId })
         resolve()
       })
     },
-    fetchRooms ({ commit, state }) {
+    fetchRooms({ commit }) {
       return new Promise((resolve, reject) => {
         api.fetchRooms(
           rooms => {
@@ -117,12 +83,26 @@ const store = new Vuex.Store({
             resolve();
           },
           error => {
-            reject();
+            reject(error);
           }
         )
       })
     },
-    sendMessage ({ commit, state }, { message }) {
+    createRoom ({ commit }, payload ) {
+      return new Promise(( resolve, reject ) => {
+        api.createRoom(
+          payload,
+          room => {
+            commit('appendRoomToList', { room });
+            resolve(room);
+          },
+          error => {
+            reject(error);
+          }
+        )
+      })
+    },
+    sendMessage({ commit, state }, { message }) {
       return new Promise((resolve, reject) => {
         const roomId = state.activeRoomId;
         const payload = { message, roomId };

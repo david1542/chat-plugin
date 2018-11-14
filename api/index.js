@@ -23,6 +23,28 @@ api.sendMessage = function ({message, roomId}, success, failure) {
   })
 }
 
+api.createRoom = function ({ message }, success, failure) {
+  const token = window.localStorage.getItem('token');
+  fetch(`${serverSrc}inbox/room`, {
+    method: 'POST',
+    body: JSON.stringify({ message }),
+    headers: {
+      'Content-Type': 'application/json',
+      'token': token
+    }
+  }).then(res => {
+    if (res.ok) {
+      return res.json();
+    } else {
+      throw {error: 500}
+    }
+  }).then(room => {
+    success(room)
+  }).catch(err => {
+    failure(err);
+  })
+}
+
 api.fetchRooms = function (success, failure) {
   const token = window.localStorage.getItem('token');
   fetch(`${serverSrc}inbox/room`, {
