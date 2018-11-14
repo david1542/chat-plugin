@@ -33,8 +33,9 @@ background-color: #aaa;
 
 .inboxStructure {
   max-width: 1030px;
-  min-width: 1030px;
+  /* min-width: 1030px; */
   max-height: 600px;
+  height: 567px;
   margin-top: 12px;
   display: block;
   box-shadow: 0px 0px 14px 3px #0000003b;
@@ -46,19 +47,22 @@ background-color: #aaa;
 
 .inboxHeaderSection {
   height: 11%;
+  width: 100%;
   border-bottom: 1px solid #4c4c4c24;
   background-color: white;
   position: relative;
+  display: flow-root;
   z-index: 1;
 }
 
 .inboxLeftTitleHeader {
   float: left;
-  padding: 20px;
+  margin: 20px;
   font-size: 15px;
   color: #76758b;
   font-weight: 700;
   text-transform: capitalize;
+  cursor: pointer;
 }
 
 span.inboxCountMessagesHeader {
@@ -527,4 +531,109 @@ img {
   position: relative;
   top: 10px;
   left: 20px;
+}
+
+
+.inputContainerStructure {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.inputStructure {
+  /* float: left; */
+  /* margin-right: 12px; */
+  margin-bottom: 10px;
+  flex-basis: 49%;
+  display: flex;
+  justify-content: center;
+}
+
+.inputStructure input {
+  width: 100%;
+  height: 37px;
+  background-repeat: no-repeat;
+  background-position-x: 7px;
+  background-position-y: 12px;
+  font-family: 'Assistant', sans-serif;
+  border-radius: 6px;
+  background-color: transparent;
+  border: solid 2px #dcdcdc;
+  padding: 0px;
+  /* margin: auto; */
+  font-size: 15px;
+  font-weight: 600;
+  padding-left: 16px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  background-image: none!important;
+  transition: 0.1s linear;
+}
+
+.textAreaStructure {
+  flex-basis: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.inputsStructure {
+  width: 650px;
+  margin: 33px auto;
+}
+
+.inputsStructure > .submitButton {
+  /* float: right; */
+  /* margin-left: 10px; */
+  margin-top: 9px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color: #798AF7;
+  color: white;
+  font-size: 19px;
+  font-weight: 700;
+  padding: 26px 17px;
+  /* margin-right: 15px; */
+  border-radius: 2px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.inputsStructure > .submitButton:hover {
+  background-color: #6D7DE2;
+}
+.textAreaStructure textarea {
+  width: 100%;
+  height: 135px;
+  border-radius: 6px;
+  background-color: transparent;
+  border: solid 2px #dcdcdc;
+  padding: 0px;
+  padding-left: 10px;
+  padding-top: 10px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  /* background-image: url(../../assets/profile.svg); */
+  outline: none;
+  resize: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  transition: 0.1s linear;
+}
+
+.inputStructure input:focus,
+.textAreaStructure textarea:focus {
+  border: solid 2px black;
+}
+
+.inputsTitle {
+  margin: 0 auto 30px auto;
+  font-weight: 600;
+  font-size: 25px;
+  color: rgba(0,0,0,0.5);
 }

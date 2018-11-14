@@ -1,49 +1,49 @@
 const store = new Vuex.Store({
   state: {
-    ...fakeData,
     activeRoomId: null,
+    currentView: 'rooms',
     emptyViews: {
       admin: [
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '1st Admin empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '2nd Admin empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '3rd Admin empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '4th Admin empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '5th Admin empty view'
         }
       ],
       user: [
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '1st User empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '2nd User empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '3rd User empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '4th User empty view'
         },
         {
-          image: '../assets/inbox.png',
+          image: '../templates/inbox/assets/inbox.png',
           message: '5th User empty view'
         }
       ]
@@ -51,7 +51,11 @@ const store = new Vuex.Store({
   },
   getters: {
     activeRoom: state => {
-      return state.rooms.find(room => room._id === state.activeRoomId)
+      if (state.rooms) {
+        return state.rooms.find(room => room._id === state.activeRoomId)
+      }
+
+      return null;
     },
     userId: () => {
       return window.localStorage.getItem('userId');
@@ -74,6 +78,9 @@ const store = new Vuex.Store({
     }
   },
   mutations: {
+    setView (state, { view }) {
+      Vue.set(state, 'currentView', view);
+    },
     setRooms (state, { rooms }) {
       Vue.set(state, 'rooms', rooms);
     },
@@ -93,6 +100,9 @@ const store = new Vuex.Store({
     }
   },
   actions: {
+    changeView({ commit }, { view }) {
+      commit('setView', { view });
+    },
     changeRoom ({ commit }, { roomId }) {
       return new Promise((resolve, reject) => {
         commit('setActiveRoom', { roomId })
