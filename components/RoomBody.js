@@ -5,10 +5,28 @@ Vue.component('room-body', {
       return this.activeRoom.messages;
     }
   },
+  mounted () {
+    this.scrollToBottom();
+  },
+  watch: {
+    activeRoom () {
+      setTimeout(() => {
+        this.scrollToBottom();
+      }, 0);
+    }
+  },
+  methods: {
+    scrollToBottom () {
+      const messageList = this.$el.querySelector('.messageContentBoxItemsWrapper');
+      messageList.scrollTop = messageList.scrollHeight;
+    }
+  },
   template: `
-  <div v-if="activeRoom" class="messageContentBoxItemsStructure">
+  <div v-show="activeRoom" class="messageContentBoxItemsStructure">
     <message-list :messages="messages" />
-    <message-editor />
+    <message-editor
+      @newMessage="scrollToBottom"
+    />
   </div>
   `
 })

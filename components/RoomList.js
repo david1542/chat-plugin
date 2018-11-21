@@ -10,7 +10,7 @@ Vue.component('room-list', {
     console.log(this.rooms);
   },
   template: `
-    <div>
+    <div class="roomListContainer">
       <room-list-item
         v-for="room in rooms"
         :room="room"

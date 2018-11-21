@@ -1,5 +1,5 @@
 const api = {};
-const serverSrc="http://localhost:3000/api/v1/";
+const serverSrc="http://192.168.252.13:3000/api/v1/";
 // const serverSrc="https://diamwill-api.herokuapp.com/api/v1/";
 api.sendMessage = function ({message, roomId}, success, failure) {
   const token = window.localStorage.getItem('token');
@@ -40,6 +40,25 @@ api.createRoom = function ({ message }, success, failure) {
     }
   }).then(room => {
     success(room)
+  }).catch(err => {
+    failure(err);
+  })
+}
+
+api.markAsRead = function ({ roomId }, success, failure) {
+  const token = window.localStorage.getItem('token');
+  fetch(`${serverSrc}inbox/room/${roomId}/read`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'token': token
+    }
+  }).then(res => {
+    if (res.ok) {
+      return success();
+    } else {
+      throw {error: 500}
+    }
   }).catch(err => {
     failure(err);
   })

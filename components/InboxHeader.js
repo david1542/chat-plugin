@@ -1,5 +1,6 @@
 Vue.component('inbox-header', {
   computed: {
+    ...Vuex.mapState(['theme']),
     numberOfMessages () {
       return this.$store.state.rooms.length;
     }
@@ -19,6 +20,7 @@ Vue.component('inbox-header', {
     <div class="inboxRightTitleHeader">
       <div
         class="inboxRightNewMessageButtonHeader"
+        :style="{'background-color': theme.primary}"
         @click="showNewMessageView('new-message')"
       >
         New Message <i class="fa fa-envelope"></i>

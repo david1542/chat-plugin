@@ -1,51 +1,46 @@
 Vue.component('message-create', {
   data () {
     return {
-      message: null
+      message: {
+        subject: '',
+        content: ''
+      }
     }
   },
   methods: {
     ...Vuex.mapActions(['changeView', 'createRoom']),
     sendMessage () {
       this.createRoom({ message: this.message }).then(() => {
-        this.changeView({view: 'rooms' });
+        this.backToRooms();
       })
+    },
+    backToRooms () {
+      this.changeView({view: 'rooms' });
     }
+  },
+  computed: {
+    ...Vuex.mapState(['theme'])
   },
   template: `
     <div class="inputsStructure">
+      <button
+        class="inputsBackButton"
+        @click="backToRooms"
+      >
+        <div>
+          <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        </div>
+        <div>
+          BACK
+        </div>
+      </button>
       <h1 class="inputsTitle">Create a new message</h1>
       <div class="inputContainerStructure">
-        <div class="inputStructure">
-          <input
-            type="text"
-            id="contactus_name"
-            placeholder="Name"
-            style="background-image: url('../assets/profile.svg');"
-          />
-        </div>
         <div class="inputStructure" style="margin-right: 0px;">
           <input
             type="text"
-            id="contactus_company"
-            placeholder="Company"
-            style="background-image: url(../assets/company.svg);"
-          />
-        </div>
-        <div class="inputStructure">
-          <input
-            type="email"
-            id="contactus_email"
-            placeholder="Email"
-            style="background-image: url(../assets/email.svg);"
-          />
-        </div>
-        <div class="inputStructure" style="margin-right: 0px;">
-          <input
-            type="tel"
-            id="contactus_phone"
-            placeholder="Phone Number"
-            style="background-image: url(../assets/phone.svg);"
+            placeholder="Subject"
+            v-model="message.subject"
           />
         </div>
         <div class="textAreaStructure">
@@ -53,7 +48,7 @@ Vue.component('message-create', {
             type="tel"
             id="contactus_message"
             placeholder="Write a message"
-            v-model="message"
+            v-model="message.content"
           >
           </textarea>
         </div>

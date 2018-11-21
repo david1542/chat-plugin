@@ -4,9 +4,18 @@ Vue.component('message-editor', {
       message: ''
     }
   },
+  computed: {
+    ...Vuex.mapState(['theme'])
+  },
   methods: {
     sendMessage () {
-      this.$store.dispatch('sendMessage', { message: this.message });
+      this.$store.dispatch('sendMessage', { message: this.message }).then(() => {
+        this.message = '';
+        this.$emit('newMessage');
+      });
+    },
+    newLine () {
+      this.message += '\\n';
     }
   },
   template: `
@@ -16,9 +25,11 @@ Vue.component('message-editor', {
         cols="50"
         placeholder="Write Something..."
         v-model="message"
+        @keydown.enter="newLine"
       ></textarea>
       <div
         class="messageContentBoxInputButton"
+        :style="{'background-color': theme.primary}"
         @click="sendMessage()"
       >
         <i class="fa fa-location-arrow"></i>

@@ -1,10 +1,47 @@
 const store = new Vuex.Store({
   state: {
+    theme: {
+      primary: '#c82449',
+      secondary: '#6D7DE2',
+      contrast: '#fff'
+    },
     activeRoomId: null,
     currentView: 'rooms',
-    emptyViews
+    emptyViews,
+    companyLogo: 'https://www.diamwill.com/site/assets/company/blackIcon.png'
   },
   getters: {
+    sortedRooms: state => {
+      if (!state.rooms) return null;
+
+      const rooms = [...state.rooms];
+
+      const findRecentMessage = messages => {
+        return messages.reduce((recentMessage, message) => {
+          const recentMoment = moment(recentMessage.createdAt);
+          const messageMoment = moment(message.createdAt);
+          if (recentMoment.diff(messageMoment) < 0) {
+            recentMessage = message;
+          }
+
+          return recentMessage;
+        }, messages[0]);
+      }
+      rooms.sort((roomA, roomB) => {
+        const recentMessageA = findRecentMessage(roomA.messages);
+        const recentMessageB = findRecentMessage(roomB.messages);
+
+        const messageATime = moment(recentMessageA.createdAt);
+        const messageBTime = moment(recentMessageB.createdAt);
+        if (messageATime.diff(messageBTime) < 0) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
+
+      return rooms;
+    },
     activeRoom: state => {
       if (state.rooms) {
         return state.rooms.find(room => room._id === state.activeRoomId)
@@ -44,6 +81,20 @@ const store = new Vuex.Store({
         Vue.set(state, 'currentView', view);
       }
     },
+    setMessagesAsRead(state, { roomId, userId }) {
+      state.rooms = state.rooms.map(room => {
+        if (room._id === roomId) {
+          room.messages = room.messages.map(message => {
+            if (!message.readBy.includes(userId)) {
+              message.readBy.push(userId);
+            }
+
+            return message;
+          });
+        }
+        return room;
+      });
+    },
     setRooms(state, { rooms }) {
       Vue.set(state, 'rooms', rooms);
     },
@@ -53,6 +104,9 @@ const store = new Vuex.Store({
       } else {
         Vue.set(state, 'activeRoomId', roomId);
       }
+    },
+    clearActiveRoom(state) {
+      Vue.set(state, 'activeRoomId', null);
     },
     appendMessageToRoom(state, { message }) {
       const room = state.rooms.find(room => room._id === message.room);
@@ -68,18 +122,29 @@ const store = new Vuex.Store({
   actions: {
     changeView({ commit }, { view }) {
       commit('setView', { view });
+      // if (view === 'new-message') {
+      //   commit('clearActiveRoom');
+      // }
     },
-    changeRoom({ commit }, { roomId }) {
+    changeRoom({ commit, dispatch, getters }, { roomId }) {
       return new Promise((resolve, reject) => {
         commit('setActiveRoom', { roomId })
+        dispatch('changeView', { view: 'rooms' });
         resolve()
       })
     },
-    fetchRooms({ commit }) {
+    fetchRooms({ commit, state, getters }) {
       return new Promise((resolve, reject) => {
         api.fetchRooms(
           rooms => {
             commit('setRooms', { rooms });
+            
+            if (state.activeRoomId) {
+              commit('setMessagesAsRead', {
+                userId: getters.userId,
+                roomId: state.activeRoomId
+              });
+            }
             resolve();
           },
           error => {
@@ -88,11 +153,12 @@ const store = new Vuex.Store({
         )
       })
     },
-    createRoom ({ commit }, payload ) {
+    createRoom ({ commit, dispatch }, payload ) {
       return new Promise(( resolve, reject ) => {
         api.createRoom(
           payload,
           room => {
+            dispatch('changeRoom', { roomId: room._id });
             commit('appendRoomToList', { room });
             resolve(room);
           },
@@ -101,6 +167,23 @@ const store = new Vuex.Store({
           }
         )
       })
+    },
+    markAsRead ({ commit, getters }, payload) {
+      return new Promise((resolve, reject) => {
+        api.markAsRead(
+          payload,
+          () => {
+            commit('setMessagesAsRead', {
+              userId: getters.userId,
+              ...payload
+            });
+            resolve();
+          },
+          error => {
+            reject(error);
+          }
+        )
+      });
     },
     sendMessage({ commit, state }, { message }) {
       return new Promise((resolve, reject) => {

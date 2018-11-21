@@ -6,15 +6,26 @@ Vue.component('message-list-item', {
     }
   },
   computed: {
+    ...Vuex.mapState(['companyLogo']),
     myMessage () {
       const { userId } = this.$store.getters;
       const { author } = this.message;
       return userId === author._id;
     },
+    isAuthorAdmin () {
+      const { author } = this.message;
+      return author.roles.includes('admin');
+    },
+    author () {
+      const user = this.message.author;
+      const firstName = user.firstName.replace(/^./, str => str.toUpperCase());
+      const lastName = user.lastName.replace(/^./, str => str.toUpperCase());
+      return `${firstName} ${lastName}`;
+    },
     thumbnail () {
-      return this.myMessage ?
+      return !this.isAuthorAdmin ?
         'https://www.diamwill.com/site/assets/userIconSmall.png' :
-        'https://www.diamwill.com/site/assets/company/blackIcon.png'
+        this.companyLogo
     },
     date () {
       return moment(this.message.createdAt).format('MMMM Do YYYY, h:mm:ss a');
@@ -30,9 +41,8 @@ Vue.component('message-list-item', {
           <img :src="thumbnail">
         </div>
         <div class="messageContentBoxItemDescStructure">
-          <div class="messageContentBoxItemDesc">
-            {{message.content}}
-          </div>
+          <div class="messageContentBoxItemAuthor">{{ author }}</div>
+          <div class="messageContentBoxItemDesc">{{message.content}}</div>
           <div class="messageContentBoxItemDate">
             {{date}}
           </div>
