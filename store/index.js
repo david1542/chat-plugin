@@ -5,6 +5,7 @@ const store = new Vuex.Store({
       secondary: '#6D7DE2',
       contrast: '#fff'
     },
+    isAuthenticated: true,
     activeRoomId: null,
     currentView: 'rooms',
     emptyViews,
@@ -117,9 +118,15 @@ const store = new Vuex.Store({
     },
     appendRoomToList (state, { room }) {
       state.rooms.push(room);
+    },
+    setUnauthorized(state) {
+      state.isAuthenticated = false;
     }
   },
   actions: {
+    setUnauthorized({ commit }) {
+      commit('setUnauthorized')
+    },
     changeView({ commit }, { view }) {
       commit('setView', { view });
       // if (view === 'new-message') {

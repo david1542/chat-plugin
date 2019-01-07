@@ -1,4 +1,9 @@
 Vue.component('inbox-header', {
+  data () {
+    return {
+      searchOpened: false
+    };
+  },
   computed: {
     ...Vuex.mapState(['theme']),
     numberOfMessages () {
@@ -8,6 +13,15 @@ Vue.component('inbox-header', {
   methods: {
     showNewMessageView (view) {
       this.$store.dispatch('changeView', { view });
+    },
+    toggleSearch () {
+      this.searchOpened = !this.searchOpened;
+
+      if (this.searchOpened) {
+        setTimeout(() => {
+          this.$refs.searchField.focus();
+        }, 0);
+      }
     }
   },
   template: `
@@ -25,7 +39,19 @@ Vue.component('inbox-header', {
       >
         New Message <i class="fa fa-envelope"></i>
       </div>
-      <div class="inboxRightSearchButtonHeader"><i class="fa fa-search"></i></div>
+      <div class="inboxRightSearchButtonHeader">
+        <i
+          @click="toggleSearch"
+          v-show="!searchOpened"
+          class="fa fa-search"
+        ></i>
+        <input
+          type="text"
+          ref="searchField"
+          v-show="searchOpened"
+          @blur="toggleSearch"
+        />
+      </div>
     </div>
   </div>
   `
